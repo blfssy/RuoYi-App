@@ -6,11 +6,13 @@ import { toast, showConfirm, tansParams } from '@/utils/common'
 
 let timeout = 10000
 const baseUrl = config.baseUrl
+const clientId = config.clientId
 
 const request = config => {
   // 是否需要设置 token
   const isToken = (config.headers || {}).isToken === false
   config.header = config.header || {}
+  config.header['clientId'] = clientId
   if (getToken() && !isToken) {
     config.header['Authorization'] = 'Bearer ' + getToken()
   }
@@ -53,7 +55,7 @@ const request = config => {
           toast(msg)
           reject(code)
         }
-        resolve(res.data)
+        resolve(res.data.data)
       })
       .catch(error => {
         let { message } = error

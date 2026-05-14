@@ -40,7 +40,7 @@
   import config from '@/config'
   import store from "@/store"
   import { uploadAvatar } from "@/api/system/user"
-  
+
   const baseUrl = config.baseUrl
 	let sysInfo = uni.getSystemInfoSync()
 	let SCREEN_WIDTH = sysInfo.screenWidth
@@ -258,8 +258,11 @@
 							let data = {name: 'avatarfile', filePath: res.tempFilePath}
 							uploadAvatar(data).then(response => {
 								store.commit('SET_AVATAR', baseUrl + response.imgUrl)
-								uni.showToast({ title: "修改成功", icon: 'success' })
-								uni.navigateBack()
+								// 重新加载用户信息（与登录成功后一致）
+								store.dispatch('GetInfo').then(() => {
+									uni.showToast({ title: "修改成功", icon: 'success' })
+									uni.navigateBack()
+								})
 							})
 						}
 					})

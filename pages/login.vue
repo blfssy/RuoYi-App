@@ -6,6 +6,12 @@
       <text class="title">若依移动端登录</text>
     </view>
     <view class="login-form-content">
+      <view class="input-item flex align-center" v-if="tenantEnabled">
+        <view class="iconfont icon-company icon"></view>
+        <picker @change="onTenantChange" :value="tenantIndex" :range="tenantList" range-key="companyName">
+          <view class="input">{{ tenantList[tenantIndex] ? tenantList[tenantIndex].companyName : '请选择租户' }}</view>
+        </picker>
+      </view>
       <view class="input-item flex align-center">
         <view class="iconfont icon-user icon"></view>
         <input v-model="loginForm.username" class="input" type="text" placeholder="请输入账号" maxlength="30" />
@@ -17,7 +23,7 @@
       <view class="input-item flex align-center" style="width: 60%;margin: 0px;" v-if="captchaEnabled">
         <view class="iconfont icon-code icon"></view>
         <input v-model="loginForm.code" type="number" class="input" placeholder="请输入验证码" maxlength="4" />
-        <view class="login-code"> 
+        <view class="login-code">
           <image :src="codeUrl" @click="getCode" class="login-code-img"></image>
         </view>
       </view>
@@ -34,12 +40,12 @@
         <text @click="handlePrivacy" class="text-blue">《隐私协议》</text>
       </view>
     </view>
-     
+
   </view>
 </template>
 
 <script>
-  import { getCodeImg } from '@/api/login'
+  import { getCodeImg, getTenantList } from '@/api/login'
   import { getToken } from '@/utils/auth'
 
   export default {
@@ -47,10 +53,16 @@
       return {
         codeUrl: "",
         captchaEnabled: true,
+        // 租户开关
+        tenantEnabled: true,
+        // 租户列表
+        tenantList: [],
+        tenantIndex: 0,
         // 用户注册开关
         register: false,
         globalConfig: getApp().globalData.config,
         loginForm: {
+          tenantId: '000000',
           username: "admin",
           password: "admin123",
           code: "",
@@ -60,6 +72,7 @@
     },
     created() {
       this.getCode()
+      this.getTenantList()
     },
     onLoad() {
       //#ifdef H5
@@ -92,6 +105,24 @@
             this.loginForm.uuid = res.uuid
           }
         })
+      },
+      // 获取租户列表
+      getTenantList() {
+        getTenantList(false).then(res => {
+          this.tenantEnabled = res.tenantEnabled === undefined ? true : res.tenantEnabled
+          if (this.tenantEnabled) {
+            this.tenantList = res.voList || []
+            if (this.tenantList.length > 0) {
+              this.tenantIndex = 0
+              this.loginForm.tenantId = this.tenantList[0].tenantId
+            }
+          }
+        })
+      },
+      // 租户选择变化
+      onTenantChange(e) {
+        this.tenantIndex = e.detail.value
+        this.loginForm.tenantId = this.tenantList[this.tenantIndex].tenantId
       },
       // 登录方法
       async handleLogin() {
