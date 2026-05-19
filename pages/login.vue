@@ -1,46 +1,58 @@
 <template>
-  <view class="normal-login-container">
-    <view class="logo-content align-center justify-center flex">
-      <image style="width: 100rpx;height: 100rpx;" :src="globalConfig.appInfo.logo" mode="widthFix">
-      </image>
-      <text class="title">若依移动端登录</text>
+  <view class="login-container">
+    <!-- 顶部渐变品牌区 -->
+    <view class="brand-section">
+      <view class="brand-logo">
+        <image :src="globalConfig.appInfo.logo" mode="widthFix"></image>
+      </view>
+      <text class="brand-title">若依管理系统</text>
+      <text class="brand-subtitle">RuoYi Management System</text>
     </view>
-    <view class="login-form-content">
-      <view class="input-item flex align-center" v-if="tenantEnabled">
-        <view class="iconfont icon-company icon"></view>
+
+    <!-- 白色悬浮卡片 -->
+    <view class="login-card">
+      <view class="card-title">欢迎登录</view>
+
+      <!-- 租户选择 -->
+      <view class="input-item" v-if="tenantEnabled">
+        <view class="iconfont icon-bank icon"></view>
         <picker @change="onTenantChange" :value="tenantIndex" :range="tenantList" range-key="companyName">
           <view class="input">{{ tenantList[tenantIndex] ? tenantList[tenantIndex].companyName : '请选择租户' }}</view>
         </picker>
+        <view class="iconfont icon-down arrow"></view>
       </view>
-      <view class="input-item flex align-center">
+
+      <!-- 用户名输入 -->
+      <view class="input-item">
         <view class="iconfont icon-user icon"></view>
         <input v-model="loginForm.username" class="input" type="text" placeholder="请输入账号" maxlength="30" />
       </view>
-      <view class="input-item flex align-center">
-        <view class="iconfont icon-password icon"></view>
-        <input v-model="loginForm.password" type="password" class="input" placeholder="请输入密码" maxlength="20" />
+
+      <!-- 密码输入 -->
+      <view class="input-item">
+        <view class="iconfont icon-anquanbaozhang icon"></view>
+        <input v-model="loginForm.password" type="password" password="true" class="input" placeholder="请输入密码" maxlength="20" />
       </view>
-      <view class="input-item flex align-center" style="width: 60%;margin: 0px;" v-if="captchaEnabled">
-        <view class="iconfont icon-code icon"></view>
+
+      <!-- 验证码输入 -->
+      <view class="input-item" v-if="captchaEnabled">
+        <view class="iconfont icon-font-size icon"></view>
         <input v-model="loginForm.code" type="number" class="input" placeholder="请输入验证码" maxlength="4" />
         <view class="login-code">
           <image :src="codeUrl" @click="getCode" class="login-code-img"></image>
         </view>
       </view>
-      <view class="action-btn">
-        <button @click="handleLogin" class="login-btn cu-btn block bg-blue lg round">登录</button>
-      </view>
-      <view class="reg text-center" v-if="register">
-        <text class="text-grey1">没有账号？</text>
-        <text @click="handleUserRegister" class="text-blue">立即注册</text>
-      </view>
+
+      <!-- 登录按钮 -->
+      <button @click="handleLogin" class="login-btn">登录</button>
+
+      <!-- 协议链接 -->
       <view class="xieyi text-center">
         <text class="text-grey1">登录即代表同意</text>
-        <text @click="handleUserAgrement" class="text-blue">《用户协议》</text>
-        <text @click="handlePrivacy" class="text-blue">《隐私协议》</text>
+        <text @click="handleUserAgrement" class="text-link">《用户协议》</text>
+        <text @click="handlePrivacy" class="text-link">《隐私协议》</text>
       </view>
     </view>
-
   </view>
 </template>
 
@@ -160,82 +172,151 @@
 </script>
 
 <style lang="scss" scoped>
-  page {
-    background-color: #ffffff;
-  }
+page {
+  background-color: #f5f6f7;
+}
 
-  .normal-login-container {
-    width: 100%;
+.login-container {
+  min-height: 100vh;
+  background-color: #f5f6f7;
+}
 
-    .logo-content {
-      width: 100%;
-      font-size: 21px;
-      text-align: center;
-      padding-top: 15%;
+// 顶部渐变品牌区
+.brand-section {
+  background: linear-gradient(135deg, #4f7cff, #6b5cff);
+  padding: 40px 20px 50px;
+  text-align: center;
+  color: white;
 
-      image {
-        border-radius: 4px;
-      }
+  .brand-logo {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-      .title {
-        margin-left: 10px;
-      }
-    }
-
-    .login-form-content {
-      text-align: center;
-      margin: 20px auto;
-      margin-top: 15%;
-      width: 80%;
-
-      .input-item {
-        margin: 20px auto;
-        background-color: #f5f6f7;
-        height: 45px;
-        border-radius: 20px;
-
-        .icon {
-          font-size: 38rpx;
-          margin-left: 10px;
-          color: #999;
-        }
-
-        .input {
-          width: 100%;
-          font-size: 14px;
-          line-height: 20px;
-          text-align: left;
-          padding-left: 15px;
-        }
-
-      }
-
-      .login-btn {
-        margin-top: 40px;
-        height: 45px;
-      }
-      
-      .reg {
-        margin-top: 15px;
-      }
-      
-      .xieyi {
-        color: #333;
-        margin-top: 20px;
-      }
-      
-      .login-code {
-        height: 38px;
-        float: right;
-      
-        .login-code-img {
-          height: 38px;
-          position: absolute;
-          margin-left: 10px;
-          width: 200rpx;
-        }
-      }
+    image {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
     }
   }
 
+  .brand-title {
+    display: block;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .brand-subtitle {
+    display: block;
+    font-size: 13px;
+    opacity: 0.8;
+  }
+}
+
+// 白色悬浮卡片
+.login-card {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 25px 20px;
+  margin: -30px 15px 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  .card-title {
+    text-align: center;
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+}
+
+// 输入框样式
+.input-item {
+  background-color: #f8f9fc;
+  border-radius: 12px;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+
+  .icon {
+    font-size: 18px;
+    color: #999;
+    margin-right: 10px;
+  }
+
+  .input {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+    background: transparent;
+    border: none;
+    outline: none;
+
+    &::placeholder {
+      color: #999;
+    }
+  }
+
+  .arrow {
+    font-size: 14px;
+    color: #999;
+  }
+
+  .login-code {
+    flex-shrink: 0;
+    width: 70px;
+    height: 32px;
+    margin-left: 10px;
+
+    .login-code-img {
+      width: 70px;
+      height: 32px;
+      border-radius: 6px;
+    }
+  }
+}
+
+// 登录按钮
+.login-btn {
+  background: linear-gradient(135deg, #4f7cff, #6b5cff);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 10px;
+  width: 100%;
+  height: 44px;
+  line-height: 24px;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+// 协议链接
+.xieyi {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 12px;
+  color: #999;
+
+  .text-grey1 {
+    color: #999;
+  }
+
+  .text-link {
+    color: #4f7cff;
+    margin: 0 3px;
+  }
+}
 </style>
